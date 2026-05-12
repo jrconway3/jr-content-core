@@ -30,9 +30,15 @@ function jr_content_core_sanitize_boolean($value)
 
 function jr_content_core_sanitize_rating($value)
 {
-    // Allow clearing/unsetting the rating by returning empty string for empty input
-    if (empty($value) || $value === '') {
-        return '';
+    // Allow clearing by explicitly checking for null/empty string, not empty()
+    // which would incorrectly treat 0 as empty.
+    if ($value === '' || $value === null) {
+        return null;
+    }
+
+    // Validate that input is numeric before converting
+    if (!is_numeric($value)) {
+        return null;
     }
 
     $value = (float) $value;

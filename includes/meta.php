@@ -58,7 +58,7 @@ function jr_content_core_register_meta()
     // - Documenting the breaking change in a migration guide
     jr_content_core_register_single_meta(array('review'), 'jr_review_rating', array(
         'single'            => true,
-        'type'              => 'number',
+        'type'              => array('number', 'null'),
         'show_in_rest'      => true,
         'sanitize_callback' => 'jr_content_core_sanitize_rating',
         'auth_callback'     => 'jr_content_core_meta_auth_callback',
