@@ -64,7 +64,8 @@ function jr_content_core_register_meta()
         'auth_callback'     => 'jr_content_core_meta_auth_callback',
     ));
 
-    jr_content_core_register_single_meta(array('review'), 'jr_review_platform', $simple_string_args);
+    // Platform is handled via the platform taxonomy, not as individual meta.
+    // This provides a single source of truth for platform filtering and querying.
     jr_content_core_register_single_meta(array('review'), 'jr_review_genre', $simple_string_args);
     jr_content_core_register_single_meta(array('review'), 'jr_review_playtime', $simple_string_args);
 }

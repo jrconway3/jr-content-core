@@ -30,6 +30,11 @@ function jr_content_core_sanitize_boolean($value)
 
 function jr_content_core_sanitize_rating($value)
 {
+    // Allow clearing/unsetting the rating by returning empty string for empty input
+    if (empty($value) || $value === '') {
+        return '';
+    }
+
     $value = (float) $value;
     if ($value < 0) {
         return 0.0;
