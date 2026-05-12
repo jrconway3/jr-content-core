@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 function jr_content_core_register_taxonomies()
 {
-    register_taxonomy('games', array('post', 'review', 'playlist', 'game', 'character'), array(
+    register_taxonomy('games', array('post', 'review', 'playlist'), array(
         'labels' => array(
             'name'                       => __('Games', 'jr-content-core'),
             'singular_name'              => __('Game', 'jr-content-core'),
@@ -54,7 +54,7 @@ function jr_content_core_register_taxonomies()
         'labels' => array(
             'name'          => __('Platforms', 'jr-content-core'),
             'singular_name' => __('Platform', 'jr-content-core'),
-            'menu_name'     => __('Platform', 'jr-content-core'),
+            'menu_name'     => __('Platforms', 'jr-content-core'),
         ),
         'hierarchical'  => true,
         'public'        => true,

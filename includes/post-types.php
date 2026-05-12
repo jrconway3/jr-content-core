@@ -4,6 +4,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Register post types for content management.
+ *
+ * NOTE: This plugin previously supported portfolio, game, and character post types.
+ * These have been removed in favor of a narrower content model using review and playlist.
+ * If there is existing content in those removed post types, consider:
+ * - Running a migration script to convert posts to review/playlist or another post type
+ * - Temporarily re-registering removed post types as hidden to prevent orphaning
+ * - Providing a deactivation hook to handle cleanup
+ */
 function jr_content_core_register_post_types()
 {
     register_post_type('review', array(
