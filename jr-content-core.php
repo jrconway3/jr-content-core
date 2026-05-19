@@ -9,14 +9,14 @@
  * Text Domain: jr-content-core
  */
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-define('JR_CONTENT_CORE_VERSION', '0.1.0');
-define('JR_CONTENT_CORE_FILE', __FILE__);
-define('JR_CONTENT_CORE_PATH', plugin_dir_path(__FILE__));
-define('JR_CONTENT_CORE_URL', plugin_dir_url(__FILE__));
+define( 'JR_CONTENT_CORE_VERSION', '0.1.0' );
+define( 'JR_CONTENT_CORE_FILE', __FILE__ );
+define( 'JR_CONTENT_CORE_PATH', plugin_dir_path( __FILE__ ) );
+define( 'JR_CONTENT_CORE_URL', plugin_dir_url( __FILE__ ) );
 
 require_once JR_CONTENT_CORE_PATH . 'includes/helpers.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/post-types.php';
@@ -25,6 +25,6 @@ require_once JR_CONTENT_CORE_PATH . 'includes/meta.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/migrations.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/bootstrap.php';
 
-register_activation_hook(JR_CONTENT_CORE_FILE, 'jr_content_core_activate');
+register_activation_hook( JR_CONTENT_CORE_FILE, 'jr_content_core_activate' );
 
 jr_content_core_bootstrap();
