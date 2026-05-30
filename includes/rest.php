@@ -51,7 +51,7 @@ function jr_content_core_rest_playlist_by_yt_id( WP_REST_Request $request ) {
 	$post_id = (int) $query->posts[0]->ID;
 
 	if ( ! current_user_can( 'edit_post', $post_id ) ) {
-		return new WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to access this playlist.', 'jr-content-core' ), array( 'status' => 403 ) );
+		return new WP_Error( 'not_found', __( 'No playlist found with that YouTube ID.', 'jr-content-core' ), array( 'status' => 404 ) );
 	}
 
 	return rest_ensure_response( array( 'post_id' => $post_id ) );
