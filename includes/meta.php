@@ -82,4 +82,22 @@ function jr_content_core_register_meta() {
 	// This provides a single source of truth for platform filtering and querying.
 	jr_content_core_register_single_meta( array( 'review' ), 'jr_review_genre', $simple_string_args );
 	jr_content_core_register_single_meta( array( 'review' ), 'jr_review_playtime', $simple_string_args );
+
+	// Playlist YouTube meta — written by n8n via REST API.
+	$playlist_string_keys = array( 'yt_playlist_id', 'yt_thumbnail_url', 'yt_published_at', 'yt_import_source' );
+	foreach ( $playlist_string_keys as $key ) {
+		jr_content_core_register_single_meta( array( 'playlist' ), $key, $simple_string_args );
+	}
+
+	jr_content_core_register_single_meta(
+		array( 'playlist' ),
+		'yt_video_count',
+		array(
+			'single'            => true,
+			'type'              => 'integer',
+			'show_in_rest'      => true,
+			'sanitize_callback' => 'absint',
+			'auth_callback'     => 'jr_content_core_meta_auth_callback',
+		)
+	);
 }
