@@ -27,7 +27,7 @@ function jr_content_core_rest_auth() {
 }
 
 function jr_content_core_rest_playlist_by_yt_id( WP_REST_Request $request ) {
-	$yt_playlist_id = $request->get_param( 'yt_playlist_id' );
+	$yt_playlist_id = $request->get_url_params()['yt_playlist_id'];
 
 	$query = new WP_Query(
 		array(
