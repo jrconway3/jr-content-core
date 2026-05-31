@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function jr_content_core_register_taxonomies() {
 	register_taxonomy(
 		'games',
-		array( 'post', 'review', 'playlist' ),
+		array( 'post', 'review', 'playlist', 'video' ),
 		array(
 			'labels'            => array(
 				'name'          => __( 'Games', 'jr-content-core' ),
@@ -59,7 +59,7 @@ function jr_content_core_register_taxonomies() {
 
 	register_taxonomy(
 		'platform',
-		array( 'post', 'review', 'playlist' ),
+		array( 'post', 'review', 'playlist', 'video' ),
 		array(
 			'labels'       => array(
 				'name'          => __( 'Platforms', 'jr-content-core' ),

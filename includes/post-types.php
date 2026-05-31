@@ -42,6 +42,58 @@ function jr_content_core_register_post_types() {
 	);
 
 	register_post_type(
+		'social',
+		array(
+			'labels'       => array(
+				'name'               => __( 'Social Links', 'jr-content-core' ),
+				'singular_name'      => __( 'Social', 'jr-content-core' ),
+				'menu_name'          => __( 'Social Links', 'jr-content-core' ),
+				'add_new_item'       => __( 'Add New Social Link', 'jr-content-core' ),
+				'edit_item'          => __( 'Edit Social Link', 'jr-content-core' ),
+				'new_item'           => __( 'New Social Link', 'jr-content-core' ),
+				'view_item'          => __( 'View Social Link', 'jr-content-core' ),
+				'search_items'       => __( 'Search Social Links', 'jr-content-core' ),
+				'not_found'          => __( 'No social links found.', 'jr-content-core' ),
+				'not_found_in_trash' => __( 'No social links found in Trash.', 'jr-content-core' ),
+			),
+			'public'       => true,
+			'show_ui'      => true,
+			'show_in_menu' => true,
+			'show_in_rest' => true,
+			'has_archive'  => false,
+			'rewrite'      => false,
+			'supports'     => array( 'title' ),
+			'menu_icon'    => 'dashicons-share',
+		)
+	);
+
+	register_post_type(
+		'video',
+		array(
+			'labels'       => array(
+				'name'               => __( 'Videos', 'jr-content-core' ),
+				'singular_name'      => __( 'Video', 'jr-content-core' ),
+				'menu_name'          => __( 'Videos', 'jr-content-core' ),
+				'add_new_item'       => __( 'Add New Video', 'jr-content-core' ),
+				'edit_item'          => __( 'Edit Video', 'jr-content-core' ),
+				'new_item'           => __( 'New Video', 'jr-content-core' ),
+				'view_item'          => __( 'View Video', 'jr-content-core' ),
+				'search_items'       => __( 'Search Videos', 'jr-content-core' ),
+				'not_found'          => __( 'No videos found.', 'jr-content-core' ),
+				'not_found_in_trash' => __( 'No videos found in Trash.', 'jr-content-core' ),
+			),
+			'public'       => true,
+			'show_ui'      => true,
+			'show_in_menu' => true,
+			'show_in_rest' => true,
+			'has_archive'  => true,
+			'rewrite'      => array( 'slug' => 'videos' ),
+			'supports'     => array( 'title', 'editor', 'thumbnail', 'author', 'revisions' ),
+			'menu_icon'    => 'dashicons-video-alt3',
+		)
+	);
+
+	register_post_type(
 		'playlist',
 		array(
 			'labels'       => array(
