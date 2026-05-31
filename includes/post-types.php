@@ -36,7 +36,7 @@ function jr_content_core_register_post_types() {
 			'show_in_rest' => true,
 			'has_archive'  => true,
 			'rewrite'      => array( 'slug' => 'reviews' ),
-			'supports'     => array( 'title', 'editor', 'thumbnail', 'author', 'revisions' ),
+			'supports'     => array( 'title', 'editor', 'thumbnail', 'author', 'revisions', 'custom-fields' ),
 			'menu_icon'    => 'dashicons-star-filled',
 		)
 	);
@@ -62,7 +62,7 @@ function jr_content_core_register_post_types() {
 			'show_in_rest' => true,
 			'has_archive'  => false,
 			'rewrite'      => false,
-			'supports'     => array( 'title' ),
+			'supports'     => array( 'title', 'custom-fields' ),
 			'menu_icon'    => 'dashicons-share',
 		)
 	);
@@ -88,7 +88,7 @@ function jr_content_core_register_post_types() {
 			'show_in_rest' => true,
 			'has_archive'  => true,
 			'rewrite'      => array( 'slug' => 'videos' ),
-			'supports'     => array( 'title', 'editor', 'thumbnail', 'author', 'revisions' ),
+			'supports'     => array( 'title', 'editor', 'thumbnail', 'author', 'revisions', 'custom-fields' ),
 			'menu_icon'    => 'dashicons-video-alt3',
 		)
 	);
@@ -114,7 +114,7 @@ function jr_content_core_register_post_types() {
 			'show_in_rest' => true,
 			'has_archive'  => true,
 			'rewrite'      => array( 'slug' => 'playlists' ),
-			'supports'     => array( 'title', 'editor', 'thumbnail', 'author', 'revisions' ),
+			'supports'     => array( 'title', 'editor', 'thumbnail', 'author', 'revisions', 'custom-fields' ),
 			'menu_icon'    => 'dashicons-playlist-video',
 		)
 	);
