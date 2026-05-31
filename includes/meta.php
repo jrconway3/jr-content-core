@@ -83,7 +83,59 @@ function jr_content_core_register_meta() {
 	jr_content_core_register_single_meta( array( 'review' ), 'jr_review_genre', $simple_string_args );
 	jr_content_core_register_single_meta( array( 'review' ), 'jr_review_playtime', $simple_string_args );
 
-	// Playlist YouTube meta — written by n8n via REST API.
+	$bool_args = array(
+		'single'            => true,
+		'type'              => 'boolean',
+		'show_in_rest'      => true,
+		'sanitize_callback' => 'jr_content_core_sanitize_boolean',
+		'auth_callback'     => 'jr_content_core_meta_auth_callback',
+	);
+
+	jr_content_core_register_single_meta( array( 'social' ), 'icon_image', array(
+		'single'            => true,
+		'type'              => 'integer',
+		'show_in_rest'      => true,
+		'sanitize_callback' => 'absint',
+		'auth_callback'     => 'jr_content_core_meta_auth_callback',
+	) );
+
+	$social_string_keys = array( 'jrblog_social_slug', 'jrblog_social_url', 'jrblog_social_name' );
+	foreach ( $social_string_keys as $key ) {
+		jr_content_core_register_single_meta( array( 'social' ), $key, $simple_string_args );
+	}
+
+	$social_bool_keys = array( 'jrblog_social_full', 'jrblog_social_sub', 'jrblog_social_share', 'jrblog_social_sharing', 'jrblog_social_follow' );
+	foreach ( $social_bool_keys as $key ) {
+		jr_content_core_register_single_meta( array( 'social' ), $key, $bool_args );
+	}
+
+	$video_string_keys = array( 'yt_video_id', 'yt_playlist_id', 'yt_published_at', 'yt_thumbnail_url', 'yt_duration', 'yt_broadcast_status', 'yt_scheduled_start', 'yt_import_source' );
+	foreach ( $video_string_keys as $key ) {
+		jr_content_core_register_single_meta( array( 'video' ), $key, $simple_string_args );
+	}
+
+	$video_count_args = array(
+		'single'            => true,
+		'type'              => 'string',
+		'show_in_rest'      => true,
+		'sanitize_callback' => 'jr_content_core_sanitize_count',
+		'auth_callback'     => 'jr_content_core_meta_auth_callback',
+	);
+	jr_content_core_register_single_meta( array( 'video' ), 'yt_view_count', $video_count_args );
+	jr_content_core_register_single_meta( array( 'video' ), 'yt_like_count', $video_count_args );
+
+	jr_content_core_register_single_meta(
+		array( 'video' ),
+		'wp_playlist_id',
+		array(
+			'single'            => true,
+			'type'              => 'integer',
+			'show_in_rest'      => true,
+			'sanitize_callback' => 'absint',
+			'auth_callback'     => 'jr_content_core_meta_auth_callback',
+		)
+	);
+
 	$playlist_string_keys = array( 'yt_playlist_id', 'yt_thumbnail_url', 'yt_published_at', 'yt_import_source' );
 	foreach ( $playlist_string_keys as $key ) {
 		jr_content_core_register_single_meta( array( 'playlist' ), $key, $simple_string_args );
