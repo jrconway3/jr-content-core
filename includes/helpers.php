@@ -14,7 +14,7 @@ function jr_content_core_taxonomies() {
 
 function jr_content_core_sanitize_count( $value ) {
 	$int = filter_var( $value, FILTER_VALIDATE_INT, array( 'options' => array( 'min_range' => 0 ) ) );
-	return $int !== false ? (string) $int : '0';
+	return false !== $int ? (string) $int : '0';
 }
 
 function jr_content_core_sanitize_string( $value ) {

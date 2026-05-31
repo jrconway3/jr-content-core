@@ -91,13 +91,17 @@ function jr_content_core_register_meta() {
 		'auth_callback'     => 'jr_content_core_meta_auth_callback',
 	);
 
-	jr_content_core_register_single_meta( array( 'social' ), 'icon_image', array(
-		'single'            => true,
-		'type'              => 'integer',
-		'show_in_rest'      => true,
-		'sanitize_callback' => 'absint',
-		'auth_callback'     => 'jr_content_core_meta_auth_callback',
-	) );
+	jr_content_core_register_single_meta(
+		array( 'social' ),
+		'icon_image',
+		array(
+			'single'            => true,
+			'type'              => 'integer',
+			'show_in_rest'      => true,
+			'sanitize_callback' => 'absint',
+			'auth_callback'     => 'jr_content_core_meta_auth_callback',
+		)
+	);
 
 	$social_string_keys = array( 'jrblog_social_slug', 'jrblog_social_url', 'jrblog_social_name' );
 	foreach ( $social_string_keys as $key ) {
