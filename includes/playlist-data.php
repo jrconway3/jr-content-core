@@ -214,7 +214,8 @@ function jr_content_core_format_video( $v ) {
 		'title'            => jr_content_core_decode_title( $v->ID ),
 		'yt_video_id'      => get_post_meta( $v->ID, 'yt_video_id', true ),
 		'yt_thumbnail_url' => get_post_meta( $v->ID, 'yt_thumbnail_url', true ),
-		'yt_duration'      => jr_content_core_format_duration( get_post_meta( $v->ID, 'yt_duration', true ) ),
+		'yt_duration'           => get_post_meta( $v->ID, 'yt_duration', true ),
+		'yt_duration_formatted' => jr_content_core_format_duration( get_post_meta( $v->ID, 'yt_duration', true ) ),
 		'yt_view_count'    => (int) get_post_meta( $v->ID, 'yt_view_count', true ),
 	);
 }
