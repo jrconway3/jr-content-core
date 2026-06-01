@@ -79,6 +79,7 @@ function jr_content_core_register_playlist_settings() {
 		'jr_sidebar_source'         => 'jr_content_core_sanitize_sidebar_source',
 		'jr_sidebar_playlist_id'    => 'jr_content_core_sanitize_single_id',
 		'jr_sidebar_video_ids'      => 'jr_content_core_sanitize_id_list',
+		'jr_sidebar_video_limit'    => 'jr_content_core_sanitize_video_limit',
 	);
 	foreach ( $settings as $option => $cb ) {
 		register_setting( 'jr_playlist_settings_group', $option, array( 'sanitize_callback' => $cb ) );
@@ -95,7 +96,12 @@ function jr_content_core_sanitize_single_id( $raw ) {
 }
 
 function jr_content_core_sanitize_sidebar_source( $raw ) {
-	return in_array( $raw, array( 'playlist', 'videos' ), true ) ? $raw : 'playlist';
+	return in_array( $raw, array( 'most_recent', 'playlist', 'videos' ), true ) ? $raw : 'most_recent';
+}
+
+function jr_content_core_sanitize_video_limit( $raw ) {
+	$val = absint( $raw );
+	return ( $val >= 1 && $val <= 20 ) ? $val : 5;
 }
 
 function jr_content_core_ajax_search_playlists() {
@@ -178,7 +184,7 @@ function jr_content_core_render_playlist_settings_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
-	$source        = get_option( 'jr_sidebar_source', 'playlist' );
+	$source        = get_option( 'jr_sidebar_source', 'most_recent' );
 	$sidebar_title = get_option( 'jr_sidebar_playlist_title', '' );
 	?>
 	<div class="wrap jr-playlist-settings">
@@ -230,6 +236,11 @@ function jr_content_core_render_playlist_settings_page() {
 					<th scope="row"><?php esc_html_e( 'Show', 'jr-content-core' ); ?></th>
 					<td>
 						<label>
+							<input type="radio" name="jr_sidebar_source" value="most_recent" <?php checked( $source, 'most_recent' ); ?>>
+							<?php esc_html_e( 'Most recent videos', 'jr-content-core' ); ?>
+						</label>
+						<br>
+						<label>
 							<input type="radio" name="jr_sidebar_source" value="playlist" <?php checked( $source, 'playlist' ); ?>>
 							<?php esc_html_e( 'A specific playlist', 'jr-content-core' ); ?>
 						</label>
@@ -238,6 +249,23 @@ function jr_content_core_render_playlist_settings_page() {
 							<input type="radio" name="jr_sidebar_source" value="videos" <?php checked( $source, 'videos' ); ?>>
 							<?php esc_html_e( 'Specific videos', 'jr-content-core' ); ?>
 						</label>
+					</td>
+				</tr>
+				<tr class="jr-source-row jr-source-row--count">
+					<th scope="row">
+						<label for="jr_sidebar_video_limit"><?php esc_html_e( 'Number of videos', 'jr-content-core' ); ?></label>
+					</th>
+					<td>
+						<input
+							type="number"
+							id="jr_sidebar_video_limit"
+							name="jr_sidebar_video_limit"
+							value="<?php echo esc_attr( get_option( 'jr_sidebar_video_limit', 5 ) ); ?>"
+							min="1"
+							max="20"
+							class="small-text"
+						>
+						<p class="description"><?php esc_html_e( 'How many videos to display (1–20). Not used for Specific videos mode.', 'jr-content-core' ); ?></p>
 					</td>
 				</tr>
 				<tr class="jr-source-row jr-source-row--playlist">
