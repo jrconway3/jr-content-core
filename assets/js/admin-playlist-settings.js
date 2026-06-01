@@ -145,7 +145,10 @@
     var btn  = document.createElement('button');
     btn.type = 'button';
     btn.className = 'jr-pill__remove';
-    btn.setAttribute('aria-label', 'Remove');
+    var removeLabel = (cfg.i18n && cfg.i18n.remove)
+      ? cfg.i18n.remove.replace('%s', item.text)
+      : 'Remove ' + item.text;
+    btn.setAttribute('aria-label', removeLabel);
     btn.innerHTML = '&times;';
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
