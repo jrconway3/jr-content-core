@@ -1,0 +1,120 @@
+/* Playlist Settings admin page */
+
+.jr-playlist-settings hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid #dcdcde;
+}
+
+/* ---- Pill picker wrapper ---- */
+
+.jr-pill-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  max-width: 500px;
+  min-height: 36px;
+  padding: 4px 6px;
+  background: #fff;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  cursor: text;
+  box-sizing: border-box;
+}
+
+.jr-pill-picker:focus-within {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: 2px solid transparent;
+}
+
+/* ---- Pills ---- */
+
+.jr-pill-picker__pills {
+  display: contents; /* pills flow inline with the search input */
+}
+
+.jr-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #f0f0f1;
+  border: 1px solid #c3c4c7;
+  border-radius: 2px;
+  padding: 2px 4px 2px 7px;
+  font-size: 12px;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.jr-pill__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jr-pill__remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 3px;
+  font-size: 15px;
+  line-height: 1;
+  color: #787c82;
+}
+
+.jr-pill__remove:hover { color: #d63638; }
+
+/* ---- Search input ---- */
+
+.jr-pill-picker__input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 140px;
+}
+
+.jr-pill-picker__search {
+  width: 100%;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 3px 4px;
+  font-size: 13px;
+  background: transparent;
+  height: 28px;
+}
+
+/* ---- Dropdown ---- */
+
+.jr-pill-picker__dropdown {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: -6px; /* align with picker border */
+  right: -6px;
+  background: #fff;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  z-index: 9999;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.jr-pill-picker__dropdown li {
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jr-pill-picker__dropdown li:hover {
+  background: #f0f6fc;
+  color: #2271b1;
+}

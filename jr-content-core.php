@@ -24,6 +24,7 @@ require_once JR_CONTENT_CORE_PATH . 'includes/taxonomies.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/meta.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/migrations.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/bootstrap.php';
+require_once JR_CONTENT_CORE_PATH . 'includes/admin.php';
 
 register_activation_hook( JR_CONTENT_CORE_FILE, 'jr_content_core_activate' );
 
