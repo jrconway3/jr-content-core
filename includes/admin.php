@@ -18,11 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_action( 'admin_menu',                  'jr_content_core_playlist_admin_menu' );
-add_action( 'admin_enqueue_scripts',       'jr_content_core_playlist_admin_assets' );
-add_action( 'admin_init',                  'jr_content_core_register_playlist_settings' );
+add_action( 'admin_menu', 'jr_content_core_playlist_admin_menu' );
+add_action( 'admin_enqueue_scripts', 'jr_content_core_playlist_admin_assets' );
+add_action( 'admin_init', 'jr_content_core_register_playlist_settings' );
 add_action( 'wp_ajax_jr_search_playlists', 'jr_content_core_ajax_search_playlists' );
-add_action( 'wp_ajax_jr_search_videos',    'jr_content_core_ajax_search_videos' );
+add_action( 'wp_ajax_jr_search_videos', 'jr_content_core_ajax_search_videos' );
 
 function jr_content_core_playlist_admin_menu() {
 	add_submenu_page(
@@ -129,7 +129,10 @@ function jr_content_core_search_posts( $post_type, $q ) {
 	);
 	return array_map(
 		function ( $p ) {
-			return array( 'id' => $p->ID, 'text' => get_the_title( $p->ID ) );
+			return array(
+				'id'   => $p->ID,
+				'text' => get_the_title( $p->ID ),
+			);
 		},
 		$posts
 	);
@@ -158,7 +161,10 @@ function jr_content_core_saved_post_objects( $ids_string, $post_type ) {
 	);
 	return array_map(
 		function ( $p ) {
-			return array( 'id' => $p->ID, 'text' => get_the_title( $p->ID ) );
+			return array(
+				'id'   => $p->ID,
+				'text' => get_the_title( $p->ID ),
+			);
 		},
 		$posts
 	);
@@ -261,8 +267,8 @@ function jr_content_core_render_pill_picker( $field_name, $ajax_action, $multipl
 		: __( 'Search videos…', 'jr-content-core' );
 	?>
 	<div class="jr-pill-picker"
-		 data-action="<?php echo esc_attr( $ajax_action ); ?>"
-		 data-multiple="<?php echo $multiple ? 'true' : 'false'; ?>">
+		data-action="<?php echo esc_attr( $ajax_action ); ?>"
+		data-multiple="<?php echo $multiple ? 'true' : 'false'; ?>">
 		<div class="jr-pill-picker__pills"></div>
 		<div class="jr-pill-picker__input-wrap">
 			<input

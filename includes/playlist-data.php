@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-add_filter( 'jr_home_playlists',   'jr_content_core_home_playlists',   10, 0 );
+add_filter( 'jr_home_playlists', 'jr_content_core_home_playlists', 10, 0 );
 add_filter( 'jr_sidebar_playlist', 'jr_content_core_sidebar_playlist', 10, 0 );
 
 /**
@@ -116,7 +116,7 @@ function jr_content_core_sidebar_playlist() {
 			)
 		);
 		return array(
-			'section_title'  => $section_title ?: __( 'Featured videos', 'jr-content-core' ),
+			'section_title'  => $section_title ? $section_title : __( 'Featured videos', 'jr-content-core' ),
 			'playlist_name'  => null,
 			'type'           => 'videos',
 			'permalink'      => null,
@@ -163,7 +163,7 @@ function jr_content_core_sidebar_playlist() {
 	);
 
 	return array(
-		'section_title'  => $section_title ?: __( 'Featured playlist', 'jr-content-core' ),
+		'section_title'  => $section_title ? $section_title : __( 'Featured playlist', 'jr-content-core' ),
 		'playlist_name'  => get_the_title( $playlist_id ),
 		'type'           => 'playlist',
 		'permalink'      => get_permalink( $playlist_id ),
