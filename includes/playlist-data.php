@@ -57,41 +57,24 @@ function jr_content_core_home_playlists() {
 		return array();
 	}
 
-	// Fetch all videos for every playlist in one query, then group in PHP.
-	// Cap at 20 per playlist to bound memory usage on large installs.
-	$playlist_ids    = array_map( function ( $pl ) { return $pl->ID; }, $playlist_posts );
-	$all_video_posts = get_posts(
-		array(
-			'post_type'      => 'video',
-			'posts_per_page' => count( $playlist_ids ) * 20,
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'post_status'    => 'publish',
-			'meta_query'     => array(
-				array(
-					'key'     => 'wp_playlist_id',
-					'value'   => $playlist_ids,
-					'compare' => 'IN',
-				),
-			),
-		)
-	);
-
-	// Group videos by playlist ID; meta cache is warm after the query above.
-	$videos_by_playlist = array();
-	foreach ( $all_video_posts as $v ) {
-		$pl_id = (int) get_post_meta( $v->ID, 'wp_playlist_id', true );
-		if ( ! isset( $videos_by_playlist[ $pl_id ] ) ) {
-			$videos_by_playlist[ $pl_id ] = array();
-		}
-		if ( count( $videos_by_playlist[ $pl_id ] ) < 20 ) {
-			$videos_by_playlist[ $pl_id ][] = $v;
-		}
-	}
-
 	$home_playlists = array();
 	foreach ( $playlist_posts as $pl ) {
-		$playlist_videos  = isset( $videos_by_playlist[ $pl->ID ] ) ? $videos_by_playlist[ $pl->ID ] : array();
+		$video_posts = get_posts(
+			array(
+				'post_type'      => 'video',
+				'posts_per_page' => 20,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'post_status'    => 'publish',
+				'meta_query'     => array(
+					array(
+						'key'   => 'wp_playlist_id',
+						'value' => $pl->ID,
+					),
+				),
+			)
+		);
+
 		$home_playlists[] = array(
 			'ID'               => $pl->ID,
 			'title'            => get_the_title( $pl->ID ),
@@ -99,7 +82,7 @@ function jr_content_core_home_playlists() {
 			'yt_playlist_id'   => get_post_meta( $pl->ID, 'yt_playlist_id', true ),
 			'yt_thumbnail_url' => get_post_meta( $pl->ID, 'yt_thumbnail_url', true ),
 			'yt_video_count'   => (int) get_post_meta( $pl->ID, 'yt_video_count', true ),
-			'videos'           => array_map( 'jr_content_core_format_video', $playlist_videos ),
+			'videos'           => array_map( 'jr_content_core_format_video', $video_posts ),
 		);
 	}
 
