@@ -1,12 +1,15 @@
 <?php
 /**
- * Playlist admin settings page and frontend data filters.
+ * Playlist admin settings page, AJAX search handlers, and settings registration.
  *
  * Provides:
  *  - "Settings" sub-page under the Playlist CPT admin menu
  *  - Searchable pill-picker UI for choosing featured/sidebar playlists
- *  - `jr_home_playlists` filter  → array of playlist context objects
- *  - `jr_sidebar_playlist` filter → single sidebar playlist context object or null
+ *
+ * Loaded only when is_admin() is true (covers both wp-admin pages and
+ * admin-ajax.php requests).
+ *
+ * Frontend data filters live in includes/playlist-data.php.
  *
  * @package JRContentCore
  */
@@ -15,206 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// -------------------------------------------------------------------------
-// Frontend data filters — run on every request so the theme can consume them
-// -------------------------------------------------------------------------
-
-add_filter( 'jr_home_playlists',   'jr_content_core_home_playlists',   10, 0 );
-add_filter( 'jr_sidebar_playlist', 'jr_content_core_sidebar_playlist', 10, 0 );
-
-/**
- * Returns the home-page playlists array for the `jr_home_playlists` filter.
- *
- * Override mode (jr_pinned_playlist_ids set): returns exactly those IDs in order.
- * Default mode: returns the 3 most recent published playlists.
- *
- * @return array
- */
-function jr_content_core_home_playlists() {
-	$pinned_ids = array_values(
-		array_filter( array_map( 'absint', explode( ',', get_option( 'jr_pinned_playlist_ids', '' ) ) ) )
-	);
-
-	if ( ! empty( $pinned_ids ) ) {
-		$playlist_posts = get_posts(
-			array(
-				'post_type'      => 'playlist',
-				'posts_per_page' => count( $pinned_ids ),
-				'post__in'       => $pinned_ids,
-				'orderby'        => 'post__in',
-				'post_status'    => 'publish',
-			)
-		);
-	} else {
-		$playlist_posts = get_posts(
-			array(
-				'post_type'      => 'playlist',
-				'posts_per_page' => 3,
-				'orderby'        => 'date',
-				'order'          => 'DESC',
-				'post_status'    => 'publish',
-			)
-		);
-	}
-
-	if ( empty( $playlist_posts ) ) {
-		return array();
-	}
-
-	// Fetch all videos for every playlist in one query, then group in PHP.
-	$playlist_ids    = array_map( fn( $pl ) => $pl->ID, $playlist_posts );
-	$all_video_posts = get_posts(
-		array(
-			'post_type'      => 'video',
-			'posts_per_page' => -1,
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'post_status'    => 'publish',
-			'meta_query'     => array(
-				array(
-					'key'     => 'wp_playlist_id',
-					'value'   => $playlist_ids,
-					'compare' => 'IN',
-				),
-			),
-		)
-	);
-
-	// Group videos by playlist ID; meta cache is warm after the query above.
-	$videos_by_playlist = array();
-	foreach ( $all_video_posts as $v ) {
-		$pl_id = (int) get_post_meta( $v->ID, 'wp_playlist_id', true );
-		if ( ! isset( $videos_by_playlist[ $pl_id ] ) ) {
-			$videos_by_playlist[ $pl_id ] = array();
-		}
-		if ( count( $videos_by_playlist[ $pl_id ] ) < 20 ) {
-			$videos_by_playlist[ $pl_id ][] = $v;
-		}
-	}
-
-	$home_playlists = array();
-	foreach ( $playlist_posts as $pl ) {
-		$home_playlists[] = array(
-			'ID'               => $pl->ID,
-			'title'            => get_the_title( $pl->ID ),
-			'permalink'        => get_permalink( $pl->ID ),
-			'yt_playlist_id'   => get_post_meta( $pl->ID, 'yt_playlist_id', true ),
-			'yt_thumbnail_url' => get_post_meta( $pl->ID, 'yt_thumbnail_url', true ),
-			'yt_video_count'   => (int) get_post_meta( $pl->ID, 'yt_video_count', true ),
-			'videos'           => array_map( 'jr_content_core_format_video', $videos_by_playlist[ $pl->ID ] ?? array() ),
-		);
-	}
-
-	return $home_playlists;
-}
-
-/**
- * Returns the sidebar playlist context object for the `jr_sidebar_playlist` filter.
- * Returns null when no playlist/video data is available.
- *
- * @return array|null
- */
-function jr_content_core_sidebar_playlist() {
-	$source        = get_option( 'jr_sidebar_source', 'playlist' );
-	$section_title = get_option( 'jr_sidebar_playlist_title', '' );
-
-	if ( 'videos' === $source ) {
-		$video_ids = array_values(
-			array_filter( array_map( 'absint', explode( ',', get_option( 'jr_sidebar_video_ids', '' ) ) ) )
-		);
-		if ( empty( $video_ids ) ) {
-			return null;
-		}
-		$video_posts = get_posts(
-			array(
-				'post_type'      => 'video',
-				'post__in'       => $video_ids,
-				'orderby'        => 'post__in',
-				'posts_per_page' => count( $video_ids ),
-				'post_status'    => 'publish',
-			)
-		);
-		return array(
-			'section_title'  => $section_title ?: __( 'Featured videos', 'jr-content-core' ),
-			'playlist_name'  => null,
-			'type'           => 'videos',
-			'permalink'      => null,
-			'yt_video_count' => count( $video_posts ),
-			'videos'         => array_map( 'jr_content_core_format_video', $video_posts ),
-		);
-	}
-
-	// Playlist mode.
-	$playlist_id = absint( get_option( 'jr_sidebar_playlist_id', 0 ) );
-	if ( ! $playlist_id ) {
-		$recent = get_posts(
-			array(
-				'post_type'      => 'playlist',
-				'posts_per_page' => 1,
-				'post_status'    => 'publish',
-			)
-		);
-		if ( empty( $recent ) ) {
-			return null;
-		}
-		$playlist_id = $recent[0]->ID;
-	}
-
-	$pl = get_post( $playlist_id );
-	if ( ! $pl || 'publish' !== $pl->post_status ) {
-		return null;
-	}
-
-	$video_posts = get_posts(
-		array(
-			'post_type'      => 'video',
-			'posts_per_page' => 10,
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'post_status'    => 'publish',
-			'meta_query'     => array(
-				array(
-					'key'   => 'wp_playlist_id',
-					'value' => $playlist_id,
-				),
-			),
-		)
-	);
-
-	return array(
-		'section_title'  => $section_title ?: __( 'Featured playlist', 'jr-content-core' ),
-		'playlist_name'  => get_the_title( $playlist_id ),
-		'type'           => 'playlist',
-		'permalink'      => get_permalink( $playlist_id ),
-		'yt_video_count' => (int) get_post_meta( $playlist_id, 'yt_video_count', true ),
-		'videos'         => array_map( 'jr_content_core_format_video', $video_posts ),
-	);
-}
-
-/**
- * Normalises a video WP_Post into the shape consumed by Twig templates.
- *
- * @param WP_Post $v Video post object.
- * @return array
- */
-function jr_content_core_format_video( $v ) {
-	return array(
-		'ID'               => $v->ID,
-		'title'            => get_the_title( $v->ID ),
-		'yt_video_id'      => get_post_meta( $v->ID, 'yt_video_id', true ),
-		'yt_thumbnail_url' => get_post_meta( $v->ID, 'yt_thumbnail_url', true ),
-		'yt_duration'      => get_post_meta( $v->ID, 'yt_duration', true ),
-		'yt_view_count'    => (int) get_post_meta( $v->ID, 'yt_view_count', true ),
-	);
-}
-
-// -------------------------------------------------------------------------
-// Admin-only: settings page, assets, settings registration, ajax handlers
-// -------------------------------------------------------------------------
-
-add_action( 'admin_menu',             'jr_content_core_playlist_admin_menu' );
-add_action( 'admin_enqueue_scripts',  'jr_content_core_playlist_admin_assets' );
-add_action( 'admin_init',             'jr_content_core_register_playlist_settings' );
+add_action( 'admin_menu',                  'jr_content_core_playlist_admin_menu' );
+add_action( 'admin_enqueue_scripts',       'jr_content_core_playlist_admin_assets' );
+add_action( 'admin_init',                  'jr_content_core_register_playlist_settings' );
 add_action( 'wp_ajax_jr_search_playlists', 'jr_content_core_ajax_search_playlists' );
 add_action( 'wp_ajax_jr_search_videos',    'jr_content_core_ajax_search_videos' );
 
@@ -258,6 +64,10 @@ function jr_content_core_playlist_admin_assets( $hook ) {
 			'pinnedPlaylists' => jr_content_core_saved_post_objects( get_option( 'jr_pinned_playlist_ids', '' ), 'playlist' ),
 			'sidebarPlaylist' => jr_content_core_saved_post_objects( get_option( 'jr_sidebar_playlist_id', '' ), 'playlist' ),
 			'sidebarVideos'   => jr_content_core_saved_post_objects( get_option( 'jr_sidebar_video_ids', '' ), 'video' ),
+			'i18n'            => array(
+				/* translators: %s: playlist or video title */
+				'remove' => __( 'Remove %s', 'jr-content-core' ),
+			),
 		)
 	);
 }
@@ -318,7 +128,9 @@ function jr_content_core_search_posts( $post_type, $q ) {
 		)
 	);
 	return array_map(
-		fn( $p ) => array( 'id' => $p->ID, 'text' => get_the_title( $p->ID ) ),
+		function ( $p ) {
+			return array( 'id' => $p->ID, 'text' => get_the_title( $p->ID ) );
+		},
 		$posts
 	);
 }
@@ -345,7 +157,9 @@ function jr_content_core_saved_post_objects( $ids_string, $post_type ) {
 		)
 	);
 	return array_map(
-		fn( $p ) => array( 'id' => $p->ID, 'text' => get_the_title( $p->ID ) ),
+		function ( $p ) {
+			return array( 'id' => $p->ID, 'text' => get_the_title( $p->ID ) );
+		},
 		$posts
 	);
 }
