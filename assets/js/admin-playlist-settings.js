@@ -192,6 +192,9 @@
       var checked = document.querySelector('input[name="jr_sidebar_source"]:checked');
       if (!checked) return;
       var val = checked.value;
+      document.querySelectorAll('.jr-source-row--count').forEach(function (row) {
+        row.style.display = val !== 'videos' ? '' : 'none';
+      });
       document.querySelectorAll('.jr-source-row--playlist').forEach(function (row) {
         row.style.display = val === 'playlist' ? '' : 'none';
       });
