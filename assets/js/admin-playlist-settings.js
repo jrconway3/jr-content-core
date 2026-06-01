@@ -32,6 +32,8 @@
     if (name === 'jr_sidebar_video_ids')   items = cfg.sidebarVideos    || [];
     var self = this;
     items.forEach(function (item) { self._addItem(item); });
+    this._syncHidden();
+    this._updateSearchVisibility();
   };
 
   PillPicker.prototype._bind = function () {
