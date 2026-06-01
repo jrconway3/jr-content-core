@@ -184,7 +184,7 @@ function jr_content_core_render_playlist_settings_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
-	$source        = get_option( 'jr_sidebar_source', 'playlist' );
+	$source        = get_option( 'jr_sidebar_source', 'most_recent' );
 	$sidebar_title = get_option( 'jr_sidebar_playlist_title', '' );
 	?>
 	<div class="wrap jr-playlist-settings">

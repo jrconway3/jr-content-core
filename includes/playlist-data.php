@@ -229,7 +229,9 @@ function jr_content_core_format_duration( $iso ) {
 	if ( ! $iso ) {
 		return '';
 	}
-	preg_match( '/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/', $iso, $m );
+	if ( 1 !== preg_match( '/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/', $iso, $m ) ) {
+		return '';
+	}
 	$h = isset( $m[1] ) ? (int) $m[1] : 0;
 	$i = isset( $m[2] ) ? (int) $m[2] : 0;
 	$s = isset( $m[3] ) ? (int) $m[3] : 0;
@@ -247,5 +249,6 @@ function jr_content_core_format_duration( $iso ) {
  * @return string Plain-text title.
  */
 function jr_content_core_decode_title( $post_id ) {
-	return html_entity_decode( get_the_title( $post_id ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	$title = html_entity_decode( get_the_title( $post_id ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	return wp_strip_all_tags( $title );
 }
