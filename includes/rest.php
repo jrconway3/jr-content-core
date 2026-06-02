@@ -79,8 +79,10 @@ function jr_content_core_rest_videos_without_thumbnails( WP_REST_Request $reques
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			continue;
 		}
+		$post    = get_post( $post_id );
 		$items[] = array(
 			'id'               => (int) $post_id,
+			'slug'             => $post->post_name,
 			'yt_thumbnail_url' => (string) get_post_meta( $post_id, 'yt_thumbnail_url', true ),
 		);
 	}
