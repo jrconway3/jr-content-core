@@ -171,7 +171,7 @@ function jr_content_core_rest_playlists_without_thumbnails( WP_REST_Request $req
 		$video_query = new WP_Query(
 			array(
 				'post_type'      => 'video',
-				'post_status'    => 'any',
+				'post_status'    => $post_statuses,
 				'posts_per_page' => -1,
 				'orderby'        => 'date',
 				'order'          => 'ASC',
@@ -183,10 +183,6 @@ function jr_content_core_rest_playlists_without_thumbnails( WP_REST_Request $req
 						'value'   => $playlist_ids,
 						'compare' => 'IN',
 						'type'    => 'NUMERIC',
-					),
-					array(
-						'key'     => '_thumbnail_id',
-						'compare' => 'EXISTS',
 					),
 					array(
 						'key'     => '_thumbnail_id',
