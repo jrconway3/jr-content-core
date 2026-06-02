@@ -158,26 +158,31 @@ function jr_content_core_rest_playlists_without_thumbnails( WP_REST_Request $req
 	$total       = (int) $query->found_posts;
 	$total_pages = (int) ceil( $total / $per_page );
 
-	$items = array();
+	$playlist_ids = array();
 	foreach ( $query->posts as $playlist_id ) {
-		if ( ! current_user_can( 'edit_post', $playlist_id ) ) {
-			continue;
+		if ( current_user_can( 'edit_post', $playlist_id ) ) {
+			$playlist_ids[] = (int) $playlist_id;
 		}
+	}
 
+	$items = array();
+
+	if ( ! empty( $playlist_ids ) ) {
 		$video_query = new WP_Query(
 			array(
 				'post_type'      => 'video',
 				'post_status'    => 'any',
-				'posts_per_page' => 1,
+				'posts_per_page' => -1,
 				'orderby'        => 'date',
 				'order'          => 'ASC',
 				'no_found_rows'  => true,
 				'fields'         => 'ids',
 				'meta_query'     => array(
 					array(
-						'key'   => 'wp_playlist_id',
-						'value' => $playlist_id,
-						'type'  => 'NUMERIC',
+						'key'     => 'wp_playlist_id',
+						'value'   => $playlist_ids,
+						'compare' => 'IN',
+						'type'    => 'NUMERIC',
 					),
 					array(
 						'key'     => '_thumbnail_id',
@@ -193,17 +198,34 @@ function jr_content_core_rest_playlists_without_thumbnails( WP_REST_Request $req
 			)
 		);
 
-		if ( empty( $video_query->posts ) ) {
-			continue;
+		$video_ids = array_map( 'intval', $video_query->posts );
+
+		update_meta_cache( 'post', $video_ids );
+		update_meta_cache( 'post', $playlist_ids );
+
+		// Build playlist_id => oldest qualifying video_id map (query is ASC so first match wins).
+		$video_by_playlist = array();
+		foreach ( $video_ids as $video_id ) {
+			$pid = (int) get_post_meta( $video_id, 'wp_playlist_id', true );
+			if ( $pid && ! isset( $video_by_playlist[ $pid ] ) ) {
+				$video_by_playlist[ $pid ] = $video_id;
+			}
 		}
 
-		$video_id = (int) $video_query->posts[0];
-
-		$items[] = array(
-			'id'                         => (int) $playlist_id,
-			'yt_playlist_id'             => (string) get_post_meta( $playlist_id, 'yt_playlist_id', true ),
-			'first_video_featured_media' => (int) get_post_meta( $video_id, '_thumbnail_id', true ),
-		);
+		foreach ( $playlist_ids as $playlist_id ) {
+			if ( ! isset( $video_by_playlist[ $playlist_id ] ) ) {
+				continue;
+			}
+			$video_id = $video_by_playlist[ $playlist_id ];
+			if ( ! current_user_can( 'edit_post', $video_id ) ) {
+				continue;
+			}
+			$items[] = array(
+				'id'                         => $playlist_id,
+				'yt_playlist_id'             => (string) get_post_meta( $playlist_id, 'yt_playlist_id', true ),
+				'first_video_featured_media' => (int) get_post_meta( $video_id, '_thumbnail_id', true ),
+			);
+		}
 	}
 
 	$response = rest_ensure_response( $items );
