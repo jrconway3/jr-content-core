@@ -37,8 +37,8 @@ function jr_content_core_rest_auth() {
 }
 
 function jr_content_core_rest_videos_without_thumbnails( WP_REST_Request $request ) {
-	$per_page = $request->get_param( 'per_page' ) ?: 100;
-	$page     = $request->get_param( 'page' ) ?: 1;
+	$per_page = (int) $request->get_param( 'per_page' );
+	$page     = (int) $request->get_param( 'page' );
 
 	$post_statuses = array( 'publish', 'draft', 'pending', 'future' );
 	if ( current_user_can( 'edit_private_posts' ) ) {
