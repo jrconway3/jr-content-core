@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function jr_content_core_register_rest_routes() {
 	register_rest_route(
 		'jr/v1',
-		'/videos/without-thumbnails',
+		'/video/without-thumbnails',
 		array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => 'jr_content_core_rest_videos_without_thumbnails',
