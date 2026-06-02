@@ -24,6 +24,7 @@ require_once JR_CONTENT_CORE_PATH . 'includes/post-types.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/taxonomies.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/meta.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/migrations.php';
+require_once JR_CONTENT_CORE_PATH . 'includes/rest.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/bootstrap.php';
 require_once JR_CONTENT_CORE_PATH . 'includes/playlist-data.php';
 if ( is_admin() ) {
