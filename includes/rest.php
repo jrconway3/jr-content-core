@@ -40,33 +40,40 @@ function jr_content_core_rest_videos_without_thumbnails( WP_REST_Request $reques
 	$per_page = $request->get_param( 'per_page' ) ?: 100;
 	$page     = $request->get_param( 'page' ) ?: 1;
 
-	$query = new WP_Query(
-		array(
-			'post_type'      => 'video',
-			'post_status'    => 'any',
-			'posts_per_page' => $per_page,
-			'paged'          => $page,
-			'fields'         => 'ids',
-			'meta_query'     => array(
-				'relation' => 'OR',
-				array(
-					'key'     => '_thumbnail_id',
-					'compare' => 'NOT EXISTS',
-				),
-				array(
-					'key'     => '_thumbnail_id',
-					'value'   => array( '', '0' ),
-					'compare' => 'IN',
-				),
+	$query_args = array(
+		'post_type'      => 'video',
+		'post_status'    => 'any',
+		'posts_per_page' => $per_page,
+		'paged'          => $page,
+		'fields'         => 'ids',
+		'meta_query'     => array(
+			'relation' => 'OR',
+			array(
+				'key'     => '_thumbnail_id',
+				'compare' => 'NOT EXISTS',
 			),
-		)
+			array(
+				'key'     => '_thumbnail_id',
+				'value'   => array( '', '0' ),
+				'compare' => 'IN',
+			),
+		),
 	);
+
+	if ( ! current_user_can( 'edit_others_posts' ) ) {
+		$query_args['author'] = get_current_user_id();
+	}
+
+	$query = new WP_Query( $query_args );
 
 	$total       = (int) $query->found_posts;
 	$total_pages = (int) ceil( $total / $per_page );
 
 	$items = array();
 	foreach ( $query->posts as $post_id ) {
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			continue;
+		}
 		$items[] = array(
 			'id'               => (int) $post_id,
 			'yt_thumbnail_url' => (string) get_post_meta( $post_id, 'yt_thumbnail_url', true ),
