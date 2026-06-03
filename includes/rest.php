@@ -171,7 +171,7 @@ function jr_content_core_rest_playlists_without_thumbnails( WP_REST_Request $req
 		$video_query = new WP_Query(
 			array(
 				'post_type'      => 'video',
-				'post_status'    => $post_statuses,
+				'post_status'    => 'any',
 				'posts_per_page' => -1,
 				'orderby'        => 'date',
 				'order'          => 'ASC',
