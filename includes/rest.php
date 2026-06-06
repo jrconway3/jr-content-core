@@ -186,6 +186,10 @@ function jr_content_core_rest_playlists_without_thumbnails( WP_REST_Request $req
 					),
 					array(
 						'key'     => '_thumbnail_id',
+						'compare' => 'EXISTS',
+					),
+					array(
+						'key'     => '_thumbnail_id',
 						'value'   => '0',
 						'compare' => '>',
 						'type'    => 'NUMERIC',
