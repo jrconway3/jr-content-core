@@ -327,12 +327,12 @@ function jr_content_core_video_playlist_filter( $post_type, $which ) {
 	if ( 'video' !== $post_type || 'top' !== $which ) {
 		return;
 	}
-	$selected  = isset( $_GET['filter_playlist_id'] ) ? absint( $_GET['filter_playlist_id'] ) : 0;
+	$selected  = isset( $_GET['filter_playlist_id'] ) ? absint( $_GET['filter_playlist_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$playlists = get_posts(
 		array(
 			'post_type'              => 'playlist',
 			'post_status'            => 'publish',
-			'posts_per_page'         => 200,
+			'posts_per_page'         => 200, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
 			'orderby'                => 'title',
 			'order'                  => 'ASC',
 			'no_found_rows'          => true,
@@ -360,7 +360,7 @@ function jr_content_core_video_playlist_filter_query( $query ) {
 	if ( 'video' !== $query->get( 'post_type' ) ) {
 		return;
 	}
-	$playlist_id = isset( $_GET['filter_playlist_id'] ) ? absint( $_GET['filter_playlist_id'] ) : 0;
+	$playlist_id = isset( $_GET['filter_playlist_id'] ) ? absint( $_GET['filter_playlist_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	if ( ! $playlist_id ) {
 		return;
 	}

@@ -220,6 +220,14 @@ function jr_content_core_game_edit_form_fields( $term ) {
 }
 
 function jr_content_core_save_game_type( $term_id ) {
+	if ( ! isset( $_POST['_wpnonce'] ) ) {
+		return;
+	}
+	$action       = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
+	$nonce_action = ( 'editedtag' === $action ) ? 'update-tag_' . $term_id : 'add-tag';
+	if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), $nonce_action ) ) {
+		return;
+	}
 	if ( ! isset( $_POST['game_type'] ) ) {
 		return;
 	}
@@ -281,6 +289,14 @@ function jr_content_core_platform_edit_form_fields( $term ) {
 }
 
 function jr_content_core_save_platform_type( $term_id ) {
+	if ( ! isset( $_POST['_wpnonce'] ) ) {
+		return;
+	}
+	$action       = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
+	$nonce_action = ( 'editedtag' === $action ) ? 'update-tag_' . $term_id : 'add-tag';
+	if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), $nonce_action ) ) {
+		return;
+	}
 	if ( ! isset( $_POST['platform_type'] ) ) {
 		return;
 	}
