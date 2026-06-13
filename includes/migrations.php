@@ -23,4 +23,5 @@ function jr_content_core_maybe_upgrade() {
 	}
 
 	update_option( 'jr_content_core_version', JR_CONTENT_CORE_VERSION );
+	flush_rewrite_rules();
 }

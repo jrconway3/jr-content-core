@@ -78,24 +78,27 @@ function jr_content_core_register_taxonomies() {
 // ─── Hierarchical Permalink Rewrite ───────────────────────────────────────────
 
 function jr_content_core_taxonomy_rewrite_rules() {
+	// (?:[^/]+/)+ matches one or more parent slug segments (non-capturing).
+	// ([^/]+) captures the leaf slug, which is unique within the taxonomy.
+	// Paged rule must come first so /page/N/ isn't swallowed by the catch-all.
 	add_rewrite_rule(
-		'^game/([^/]+)/([^/]+)/page/([0-9]{1,})/?$',
-		'index.php?games=$matches[2]&paged=$matches[3]',
+		'^game/(?:[^/]+/)+([^/]+)/page/([0-9]{1,})/?$',
+		'index.php?games=$matches[1]&paged=$matches[2]',
 		'top'
 	);
 	add_rewrite_rule(
-		'^game/([^/]+)/([^/]+)/?$',
-		'index.php?games=$matches[2]',
+		'^game/(?:[^/]+/)+([^/]+)/?$',
+		'index.php?games=$matches[1]',
 		'top'
 	);
 	add_rewrite_rule(
-		'^platform/([^/]+)/([^/]+)/page/([0-9]{1,})/?$',
-		'index.php?platform=$matches[2]&paged=$matches[3]',
+		'^platform/(?:[^/]+/)+([^/]+)/page/([0-9]{1,})/?$',
+		'index.php?platform=$matches[1]&paged=$matches[2]',
 		'top'
 	);
 	add_rewrite_rule(
-		'^platform/([^/]+)/([^/]+)/?$',
-		'index.php?platform=$matches[2]',
+		'^platform/(?:[^/]+/)+([^/]+)/?$',
+		'index.php?platform=$matches[1]',
 		'top'
 	);
 }
@@ -108,7 +111,7 @@ function jr_content_core_term_link( $termlink, $term, $taxonomy ) {
 	$base = ( 'games' === $taxonomy ) ? 'game' : 'platform';
 
 	if ( ! $term->parent ) {
-		return home_url( "/{$base}/{$term->slug}/" );
+		return user_trailingslashit( home_url( "/{$base}/{$term->slug}" ), 'category' );
 	}
 
 	$ancestors = get_ancestors( $term->term_id, $taxonomy, 'taxonomy' );
@@ -123,7 +126,7 @@ function jr_content_core_term_link( $termlink, $term, $taxonomy ) {
 	}
 	$slugs[] = $term->slug;
 
-	return home_url( "/{$base}/" . implode( '/', $slugs ) . '/' );
+	return user_trailingslashit( home_url( "/{$base}/" . implode( '/', $slugs ) ), 'category' );
 }
 
 // ─── Game Taxonomy Term Meta (game_type) ──────────────────────────────────────
@@ -164,9 +167,8 @@ function jr_content_core_save_game_type( $term_id ) {
 	if ( ! isset( $_POST['game_type'] ) ) {
 		return;
 	}
-	$value = in_array( $_POST['game_type'], array( 'franchise', 'game' ), true )
-		? sanitize_key( $_POST['game_type'] )
-		: 'game';
+	$raw   = sanitize_key( wp_unslash( $_POST['game_type'] ) );
+	$value = in_array( $raw, array( 'franchise', 'game' ), true ) ? $raw : 'game';
 	update_term_meta( $term_id, 'game_type', $value );
 }
 
@@ -226,9 +228,8 @@ function jr_content_core_save_platform_type( $term_id ) {
 	if ( ! isset( $_POST['platform_type'] ) ) {
 		return;
 	}
-	$value = in_array( $_POST['platform_type'], array( 'manufacturer', 'platform' ), true )
-		? sanitize_key( $_POST['platform_type'] )
-		: 'platform';
+	$raw   = sanitize_key( wp_unslash( $_POST['platform_type'] ) );
+	$value = in_array( $raw, array( 'manufacturer', 'platform' ), true ) ? $raw : 'platform';
 	update_term_meta( $term_id, 'platform_type', $value );
 }
 

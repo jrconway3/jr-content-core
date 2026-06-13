@@ -26,7 +26,7 @@ add_action( 'wp_ajax_jr_search_videos', 'jr_content_core_ajax_search_videos' );
 
 add_filter( 'manage_video_posts_columns', 'jr_content_core_video_playlist_column' );
 add_action( 'manage_video_posts_custom_column', 'jr_content_core_video_playlist_column_content', 10, 2 );
-add_action( 'restrict_manage_posts', 'jr_content_core_video_playlist_filter' );
+add_action( 'restrict_manage_posts', 'jr_content_core_video_playlist_filter', 10, 2 );
 add_action( 'pre_get_posts', 'jr_content_core_video_playlist_filter_query' );
 
 function jr_content_core_playlist_admin_menu() {
@@ -319,8 +319,8 @@ function jr_content_core_video_playlist_column_content( $column_name, $post_id )
 	echo '<a href="' . esc_url( $edit_url ) . '">' . esc_html( get_the_title( $playlist ) ) . '</a>';
 }
 
-function jr_content_core_video_playlist_filter( $post_type ) {
-	if ( 'video' !== $post_type ) {
+function jr_content_core_video_playlist_filter( $post_type, $which ) {
+	if ( 'video' !== $post_type || 'top' !== $which ) {
 		return;
 	}
 	$selected  = isset( $_GET['filter_playlist_id'] ) ? absint( $_GET['filter_playlist_id'] ) : 0;
