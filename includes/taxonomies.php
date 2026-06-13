@@ -194,6 +194,7 @@ function jr_content_core_game_add_form_fields() {
 		<select id="game_type" name="game_type">
 			<option value="game"><?php esc_html_e( 'Game', 'jr-content-core' ); ?></option>
 			<option value="franchise"><?php esc_html_e( 'Franchise', 'jr-content-core' ); ?></option>
+			<option value="genre"><?php esc_html_e( 'Genre', 'jr-content-core' ); ?></option>
 		</select>
 	</div>
 	<?php
@@ -213,6 +214,7 @@ function jr_content_core_game_edit_form_fields( $term ) {
 			<select id="game_type" name="game_type">
 				<option value="game" <?php selected( $game_type, 'game' ); ?>><?php esc_html_e( 'Game', 'jr-content-core' ); ?></option>
 				<option value="franchise" <?php selected( $game_type, 'franchise' ); ?>><?php esc_html_e( 'Franchise', 'jr-content-core' ); ?></option>
+				<option value="genre" <?php selected( $game_type, 'genre' ); ?>><?php esc_html_e( 'Genre', 'jr-content-core' ); ?></option>
 			</select>
 		</td>
 	</tr>
@@ -232,7 +234,7 @@ function jr_content_core_save_game_type( $term_id ) {
 		return;
 	}
 	$raw   = sanitize_key( wp_unslash( $_POST['game_type'] ) );
-	$value = in_array( $raw, array( 'franchise', 'game' ), true ) ? $raw : 'game';
+	$value = in_array( $raw, array( 'franchise', 'game', 'genre' ), true ) ? $raw : 'game';
 	update_term_meta( $term_id, 'game_type', $value );
 }
 
