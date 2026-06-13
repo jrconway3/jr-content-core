@@ -80,9 +80,10 @@ function jr_content_core_register_taxonomies() {
 // ─── Hierarchical Permalink Rewrite ───────────────────────────────────────────
 
 function jr_content_core_taxonomy_rewrite_rules() {
-	// add_rewrite_rule( ..., 'top' ) prepends, so the LAST call wins.
-	// Rules are added lowest-priority-first so the most specific rule
-	// ends up at the top of the list and is evaluated first.
+	// add_rewrite_rule( ..., 'top' ) appends to $wp_rewrite->extra_rules_top,
+	// which is merged before WordPress's generated rules via array_merge().
+	// Within extra_rules_top, PHP insertion order is preserved: FIRST added
+	// rule is FIRST evaluated. Add most-specific rules first.
 	//
 	// Desired evaluation order per taxonomy:
 	//   1. top-level paged  (/game/<slug>/page/<n>/)
@@ -91,23 +92,15 @@ function jr_content_core_taxonomy_rewrite_rules() {
 	//   4. hierarchical feed  (/game/.../leaf/feed/)
 	//   5. hierarchical catch-all  (/game/.../leaf/)
 	//
-	// Feed rules (3-4) must precede the catch-all so /game/<slug>/feed/
-	// is not mistaken for a child term slug named "feed".
+	// Rules 1-4 must precede the catch-all (rule 5) so that pagination and
+	// feed suffixes are not mistaken for child term slugs, and so our rules
+	// beat WordPress's default ^game/(.+?)/?$ which matches the full path
+	// including slashes (resulting in a 404 for any child term URL).
 
-	// --- game (added lowest→highest priority so highest is evaluated first) ---
+	// --- game (most specific first) ---
 	add_rewrite_rule(
-		'^game/(?:[^/]+/)+([^/]+)/?$',
-		'index.php?games=$matches[1]',
-		'top'
-	);
-	add_rewrite_rule(
-		'^game/(?:[^/]+/)+([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
-		'index.php?games=$matches[1]&feed=$matches[2]',
-		'top'
-	);
-	add_rewrite_rule(
-		'^game/([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
-		'index.php?games=$matches[1]&feed=$matches[2]',
+		'^game/([^/]+)/page/([0-9]{1,})/?$',
+		'index.php?games=$matches[1]&paged=$matches[2]',
 		'top'
 	);
 	add_rewrite_rule(
@@ -116,25 +109,25 @@ function jr_content_core_taxonomy_rewrite_rules() {
 		'top'
 	);
 	add_rewrite_rule(
-		'^game/([^/]+)/page/([0-9]{1,})/?$',
-		'index.php?games=$matches[1]&paged=$matches[2]',
+		'^game/([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?games=$matches[1]&feed=$matches[2]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^game/(?:[^/]+/)+([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?games=$matches[1]&feed=$matches[2]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^game/(?:[^/]+/)+([^/]+)/?$',
+		'index.php?games=$matches[1]',
 		'top'
 	);
 
-	// --- platform ---
+	// --- platform (same order) ---
 	add_rewrite_rule(
-		'^platform/(?:[^/]+/)+([^/]+)/?$',
-		'index.php?platform=$matches[1]',
-		'top'
-	);
-	add_rewrite_rule(
-		'^platform/(?:[^/]+/)+([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
-		'index.php?platform=$matches[1]&feed=$matches[2]',
-		'top'
-	);
-	add_rewrite_rule(
-		'^platform/([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
-		'index.php?platform=$matches[1]&feed=$matches[2]',
+		'^platform/([^/]+)/page/([0-9]{1,})/?$',
+		'index.php?platform=$matches[1]&paged=$matches[2]',
 		'top'
 	);
 	add_rewrite_rule(
@@ -143,8 +136,18 @@ function jr_content_core_taxonomy_rewrite_rules() {
 		'top'
 	);
 	add_rewrite_rule(
-		'^platform/([^/]+)/page/([0-9]{1,})/?$',
-		'index.php?platform=$matches[1]&paged=$matches[2]',
+		'^platform/([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?platform=$matches[1]&feed=$matches[2]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^platform/(?:[^/]+/)+([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?platform=$matches[1]&feed=$matches[2]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^platform/(?:[^/]+/)+([^/]+)/?$',
+		'index.php?platform=$matches[1]',
 		'top'
 	);
 }
