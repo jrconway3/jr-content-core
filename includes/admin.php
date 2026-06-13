@@ -332,7 +332,7 @@ function jr_content_core_video_playlist_filter( $post_type, $which ) {
 		array(
 			'post_type'              => 'playlist',
 			'post_status'            => 'publish',
-			'posts_per_page'         => -1,
+			'posts_per_page'         => 200,
 			'orderby'                => 'title',
 			'order'                  => 'ASC',
 			'no_found_rows'          => true,

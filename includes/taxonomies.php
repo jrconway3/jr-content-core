@@ -85,16 +85,27 @@ function jr_content_core_taxonomy_rewrite_rules() {
 	// Desired evaluation order per taxonomy:
 	//   1. top-level paged  (/game/<slug>/page/<n>/)
 	//   2. hierarchical paged  (/game/.../leaf/page/<n>/)
-	//   3. hierarchical catch-all  (/game/.../leaf/)
+	//   3. top-level feed  (/game/<slug>/feed/ or /game/<slug>/rss2/)
+	//   4. hierarchical feed  (/game/.../leaf/feed/)
+	//   5. hierarchical catch-all  (/game/.../leaf/)
 	//
-	// Without rule 1, the catch-all (rule 3) would match
-	// /game/<slug>/page/<n>/ by treating 'page' and '<n>' as two path
-	// segments, resolving ?games=<n> instead of paged=<n>.
+	// Feed rules (3-4) must precede the catch-all so /game/<slug>/feed/
+	// is not mistaken for a child term slug named "feed".
 
 	// --- game (added lowest→highest priority so highest is evaluated first) ---
 	add_rewrite_rule(
 		'^game/(?:[^/]+/)+([^/]+)/?$',
 		'index.php?games=$matches[1]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^game/(?:[^/]+/)+([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?games=$matches[1]&feed=$matches[2]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^game/([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?games=$matches[1]&feed=$matches[2]',
 		'top'
 	);
 	add_rewrite_rule(
@@ -112,6 +123,16 @@ function jr_content_core_taxonomy_rewrite_rules() {
 	add_rewrite_rule(
 		'^platform/(?:[^/]+/)+([^/]+)/?$',
 		'index.php?platform=$matches[1]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^platform/(?:[^/]+/)+([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?platform=$matches[1]&feed=$matches[2]',
+		'top'
+	);
+	add_rewrite_rule(
+		'^platform/([^/]+)/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$',
+		'index.php?platform=$matches[1]&feed=$matches[2]',
 		'top'
 	);
 	add_rewrite_rule(
