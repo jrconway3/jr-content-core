@@ -78,17 +78,40 @@ function jr_content_core_register_taxonomies() {
 // ─── Hierarchical Permalink Rewrite ───────────────────────────────────────────
 
 function jr_content_core_taxonomy_rewrite_rules() {
-	// (?:[^/]+/)+ matches one or more parent slug segments (non-capturing).
-	// ([^/]+) captures the leaf slug, which is unique within the taxonomy.
-	// Paged rule must come first so /page/N/ isn't swallowed by the catch-all.
+	// add_rewrite_rule( ..., 'top' ) prepends, so the LAST call wins.
+	// Rules are added lowest-priority-first so the most specific rule
+	// ends up at the top of the list and is evaluated first.
+	//
+	// Desired evaluation order per taxonomy:
+	//   1. top-level paged  (/game/<slug>/page/<n>/)
+	//   2. hierarchical paged  (/game/.../leaf/page/<n>/)
+	//   3. hierarchical catch-all  (/game/.../leaf/)
+	//
+	// Without rule 1, the catch-all (rule 3) would match
+	// /game/<slug>/page/<n>/ by treating 'page' and '<n>' as two path
+	// segments, resolving ?games=<n> instead of paged=<n>.
+
+	// --- game (added lowest→highest priority so highest is evaluated first) ---
+	add_rewrite_rule(
+		'^game/(?:[^/]+/)+([^/]+)/?$',
+		'index.php?games=$matches[1]',
+		'top'
+	);
 	add_rewrite_rule(
 		'^game/(?:[^/]+/)+([^/]+)/page/([0-9]{1,})/?$',
 		'index.php?games=$matches[1]&paged=$matches[2]',
 		'top'
 	);
 	add_rewrite_rule(
-		'^game/(?:[^/]+/)+([^/]+)/?$',
-		'index.php?games=$matches[1]',
+		'^game/([^/]+)/page/([0-9]{1,})/?$',
+		'index.php?games=$matches[1]&paged=$matches[2]',
+		'top'
+	);
+
+	// --- platform ---
+	add_rewrite_rule(
+		'^platform/(?:[^/]+/)+([^/]+)/?$',
+		'index.php?platform=$matches[1]',
 		'top'
 	);
 	add_rewrite_rule(
@@ -97,8 +120,8 @@ function jr_content_core_taxonomy_rewrite_rules() {
 		'top'
 	);
 	add_rewrite_rule(
-		'^platform/(?:[^/]+/)+([^/]+)/?$',
-		'index.php?platform=$matches[1]',
+		'^platform/([^/]+)/page/([0-9]{1,})/?$',
+		'index.php?platform=$matches[1]&paged=$matches[2]',
 		'top'
 	);
 }
@@ -120,9 +143,10 @@ function jr_content_core_term_link( $termlink, $term, $taxonomy ) {
 	$slugs = array();
 	foreach ( $ancestors as $ancestor_id ) {
 		$ancestor = get_term( $ancestor_id, $taxonomy );
-		if ( $ancestor && ! is_wp_error( $ancestor ) ) {
-			$slugs[] = $ancestor->slug;
+		if ( ! $ancestor || is_wp_error( $ancestor ) ) {
+			return $termlink;
 		}
+		$slugs[] = $ancestor->slug;
 	}
 	$slugs[] = $term->slug;
 
