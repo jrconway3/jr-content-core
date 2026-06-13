@@ -24,6 +24,11 @@ add_action( 'admin_init', 'jr_content_core_register_playlist_settings' );
 add_action( 'wp_ajax_jr_search_playlists', 'jr_content_core_ajax_search_playlists' );
 add_action( 'wp_ajax_jr_search_videos', 'jr_content_core_ajax_search_videos' );
 
+add_filter( 'manage_video_posts_columns', 'jr_content_core_video_playlist_column' );
+add_action( 'manage_video_posts_custom_column', 'jr_content_core_video_playlist_column_content', 10, 2 );
+add_action( 'restrict_manage_posts', 'jr_content_core_video_playlist_filter' );
+add_action( 'pre_get_posts', 'jr_content_core_video_playlist_filter_query' );
+
 function jr_content_core_playlist_admin_menu() {
 	add_submenu_page(
 		'edit.php?post_type=playlist',
@@ -288,6 +293,75 @@ function jr_content_core_render_playlist_settings_page() {
 	</div>
 	<?php
 }
+
+// ─── Video CPT Admin List: Playlist Column and Filter ─────────────────────────
+
+function jr_content_core_video_playlist_column( $columns ) {
+	$columns['playlist'] = __( 'Playlist', 'jr-content-core' );
+	return $columns;
+}
+
+function jr_content_core_video_playlist_column_content( $column_name, $post_id ) {
+	if ( 'playlist' !== $column_name ) {
+		return;
+	}
+	$playlist_id = (int) get_post_meta( $post_id, 'wp_playlist_id', true );
+	if ( ! $playlist_id ) {
+		echo '&mdash;';
+		return;
+	}
+	$playlist = get_post( $playlist_id );
+	if ( ! $playlist ) {
+		echo '&mdash;';
+		return;
+	}
+	$edit_url = get_edit_post_link( $playlist_id );
+	echo '<a href="' . esc_url( $edit_url ) . '">' . esc_html( get_the_title( $playlist ) ) . '</a>';
+}
+
+function jr_content_core_video_playlist_filter( $post_type ) {
+	if ( 'video' !== $post_type ) {
+		return;
+	}
+	$selected  = isset( $_GET['filter_playlist_id'] ) ? absint( $_GET['filter_playlist_id'] ) : 0;
+	$playlists = get_posts(
+		array(
+			'post_type'      => 'playlist',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'title',
+			'order'          => 'ASC',
+		)
+	);
+	?>
+	<select name="filter_playlist_id">
+		<option value="0"><?php esc_html_e( 'All Playlists', 'jr-content-core' ); ?></option>
+		<?php foreach ( $playlists as $playlist ) : ?>
+			<option value="<?php echo esc_attr( $playlist->ID ); ?>" <?php selected( $selected, $playlist->ID ); ?>>
+				<?php echo esc_html( get_the_title( $playlist ) ); ?>
+			</option>
+		<?php endforeach; ?>
+	</select>
+	<?php
+}
+
+function jr_content_core_video_playlist_filter_query( $query ) {
+	global $pagenow;
+	if ( ! is_admin() || 'edit.php' !== $pagenow || ! $query->is_main_query() ) {
+		return;
+	}
+	if ( 'video' !== $query->get( 'post_type' ) ) {
+		return;
+	}
+	$playlist_id = isset( $_GET['filter_playlist_id'] ) ? absint( $_GET['filter_playlist_id'] ) : 0;
+	if ( ! $playlist_id ) {
+		return;
+	}
+	$query->set( 'meta_key', 'wp_playlist_id' );
+	$query->set( 'meta_value', $playlist_id );
+}
+
+// ─── Settings Page and Pill Picker ───────────────────────────────────────────
 
 function jr_content_core_render_pill_picker( $field_name, $ajax_action, $multiple, $current_val ) {
 	$placeholder = 'jr_search_playlists' === $ajax_action

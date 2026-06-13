@@ -8,6 +8,7 @@ function jr_content_core_activate() {
 	jr_content_core_register_post_types();
 	jr_content_core_register_taxonomies();
 	jr_content_core_register_meta();
+	jr_content_core_taxonomy_rewrite_rules();
 
 	update_option( 'jr_content_core_version', JR_CONTENT_CORE_VERSION );
 
