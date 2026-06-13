@@ -131,10 +131,21 @@ function jr_content_core_term_link( $termlink, $term, $taxonomy ) {
 		return $termlink;
 	}
 
+	// Plain permalinks: pretty URLs are not routed, so fall back to default.
+	if ( empty( get_option( 'permalink_structure' ) ) ) {
+		return $termlink;
+	}
+
+	global $wp_rewrite;
+	// index.php-style permalinks prefix every path with /index.php.
+	$prefix = ( isset( $wp_rewrite ) && $wp_rewrite->using_index_permalinks() )
+		? '/' . ltrim( $wp_rewrite->index, '/' )
+		: '';
+
 	$base = ( 'games' === $taxonomy ) ? 'game' : 'platform';
 
 	if ( ! $term->parent ) {
-		return user_trailingslashit( home_url( "/{$base}/{$term->slug}" ), 'category' );
+		return home_url( user_trailingslashit( "{$prefix}/{$base}/{$term->slug}", 'category' ) );
 	}
 
 	$ancestors = get_ancestors( $term->term_id, $taxonomy, 'taxonomy' );
@@ -150,7 +161,7 @@ function jr_content_core_term_link( $termlink, $term, $taxonomy ) {
 	}
 	$slugs[] = $term->slug;
 
-	return user_trailingslashit( home_url( "/{$base}/" . implode( '/', $slugs ) ), 'category' );
+	return home_url( user_trailingslashit( "{$prefix}/{$base}/" . implode( '/', $slugs ), 'category' ) );
 }
 
 // ─── Game Taxonomy Term Meta (game_type) ──────────────────────────────────────

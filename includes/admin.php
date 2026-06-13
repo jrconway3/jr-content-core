@@ -316,6 +316,10 @@ function jr_content_core_video_playlist_column_content( $column_name, $post_id )
 		return;
 	}
 	$edit_url = get_edit_post_link( $playlist_id );
+	if ( ! $edit_url ) {
+		echo esc_html( get_the_title( $playlist ) );
+		return;
+	}
 	echo '<a href="' . esc_url( $edit_url ) . '">' . esc_html( get_the_title( $playlist ) ) . '</a>';
 }
 
