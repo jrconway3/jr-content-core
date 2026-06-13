@@ -22,13 +22,13 @@ function jr_content_core_register_taxonomies() {
 				'search_items'  => __( 'Search Games', 'jr-content-core' ),
 				'not_found'     => __( 'No games found.', 'jr-content-core' ),
 			),
-			'hierarchical'        => true,
-			'public'              => true,
-			'show_ui'             => true,
-			'show_in_rest'        => true,
-			'show_admin_column'   => true,
-			'show_in_nav_menus'   => true,
-			'rewrite'             => array( 'slug' => 'game' ),
+			'hierarchical'      => true,
+			'public'            => true,
+			'show_ui'           => true,
+			'show_in_rest'      => true,
+			'show_admin_column' => true,
+			'show_in_nav_menus' => true,
+			'rewrite'           => array( 'slug' => 'game' ),
 		)
 	);
 
@@ -62,7 +62,7 @@ function jr_content_core_register_taxonomies() {
 		'platform',
 		array( 'post', 'review', 'playlist', 'video' ),
 		array(
-			'labels'       => array(
+			'labels'            => array(
 				'name'          => __( 'Platforms', 'jr-content-core' ),
 				'singular_name' => __( 'Platform', 'jr-content-core' ),
 				'menu_name'     => __( 'Platforms', 'jr-content-core' ),
