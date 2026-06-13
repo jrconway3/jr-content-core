@@ -311,7 +311,7 @@ function jr_content_core_video_playlist_column_content( $column_name, $post_id )
 		return;
 	}
 	$playlist = get_post( $playlist_id );
-	if ( ! $playlist ) {
+	if ( ! $playlist || 'playlist' !== $playlist->post_type ) {
 		echo '&mdash;';
 		return;
 	}
