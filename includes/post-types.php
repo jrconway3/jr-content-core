@@ -44,7 +44,7 @@ function jr_content_core_register_post_types() {
 	register_post_type(
 		'social',
 		array(
-			'labels'              => array(
+			'labels'             => array(
 				'name'               => __( 'Social Links', 'jr-content-core' ),
 				'singular_name'      => __( 'Social', 'jr-content-core' ),
 				'menu_name'          => __( 'Social Links', 'jr-content-core' ),
@@ -56,16 +56,16 @@ function jr_content_core_register_post_types() {
 				'not_found'          => __( 'No social links found.', 'jr-content-core' ),
 				'not_found_in_trash' => __( 'No social links found in Trash.', 'jr-content-core' ),
 			),
-			'public'              => false,
-			'publicly_queryable'  => false,
-			'show_ui'             => true,
-			'show_in_menu'        => true,
-			'show_in_rest'        => true,
-			'show_in_nav_menus'   => true,
-			'has_archive'         => false,
-			'rewrite'             => false,
-			'supports'            => array( 'title', 'custom-fields' ),
-			'menu_icon'           => 'dashicons-share',
+			'public'             => false,
+			'publicly_queryable' => false,
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'show_in_rest'       => true,
+			'show_in_nav_menus'  => true,
+			'has_archive'        => false,
+			'rewrite'            => false,
+			'supports'           => array( 'title', 'custom-fields' ),
+			'menu_icon'          => 'dashicons-share',
 		)
 	);
 
