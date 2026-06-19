@@ -64,7 +64,7 @@ function jr_content_core_register_post_types() {
 			'show_in_nav_menus'  => true,
 			'has_archive'        => false,
 			'rewrite'            => false,
-			'supports'           => array( 'title', 'custom-fields' ),
+			'supports'           => array( 'title' ),
 			'menu_icon'          => 'dashicons-share',
 		)
 	);
