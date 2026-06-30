@@ -370,7 +370,7 @@ function jr_content_core_rest_playlists_games_terms( WP_REST_Request $request ) 
 		$query_args['date_query'] = array(
 			array(
 				'column' => 'post_modified_gmt',
-				'after'  => $modified_after,
+				'after'  => gmdate( 'Y-m-d H:i:s', strtotime( $modified_after ) ),
 			),
 		);
 	}
@@ -389,10 +389,11 @@ function jr_content_core_rest_playlists_games_terms( WP_REST_Request $request ) 
 	$terms_by_playlist = array();
 	if ( ! empty( $playlist_ids ) ) {
 		$all_terms = wp_get_object_terms( $playlist_ids, 'games', array( 'fields' => 'all_with_object_id' ) );
-		if ( ! is_wp_error( $all_terms ) ) {
-			foreach ( $all_terms as $term ) {
-				$terms_by_playlist[ (int) $term->object_id ][] = (int) $term->term_id;
-			}
+		if ( is_wp_error( $all_terms ) ) {
+			return $all_terms;
+		}
+		foreach ( $all_terms as $term ) {
+			$terms_by_playlist[ (int) $term->object_id ][] = (int) $term->term_id;
 		}
 	}
 
@@ -475,10 +476,11 @@ function jr_content_core_rest_videos_by_playlist( WP_REST_Request $request ) {
 	$terms_by_video = array();
 	if ( ! empty( $video_ids ) ) {
 		$all_terms = wp_get_object_terms( $video_ids, 'games', array( 'fields' => 'all_with_object_id' ) );
-		if ( ! is_wp_error( $all_terms ) ) {
-			foreach ( $all_terms as $term ) {
-				$terms_by_video[ (int) $term->object_id ][] = (int) $term->term_id;
-			}
+		if ( is_wp_error( $all_terms ) ) {
+			return $all_terms;
+		}
+		foreach ( $all_terms as $term ) {
+			$terms_by_video[ (int) $term->object_id ][] = (int) $term->term_id;
 		}
 	}
 
@@ -526,7 +528,10 @@ function jr_content_core_rest_video_set_games_terms( WP_REST_Request $request ) 
 	}
 
 	$updated_terms = wp_get_object_terms( $video_id, 'games', array( 'fields' => 'ids' ) );
-	$updated_ids   = is_wp_error( $updated_terms ) ? array() : array_map( 'intval', $updated_terms );
+	if ( is_wp_error( $updated_terms ) ) {
+		return $updated_terms;
+	}
+	$updated_ids = array_map( 'intval', $updated_terms );
 
 	return rest_ensure_response(
 		array(
