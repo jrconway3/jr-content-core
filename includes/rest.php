@@ -103,6 +103,20 @@ function jr_content_core_register_rest_routes() {
 						return $value >= 1;
 					},
 				),
+				'per_page'    => array(
+					'default'           => 100,
+					'sanitize_callback' => 'absint',
+					'validate_callback' => function ( $value ) {
+						return $value >= 1 && $value <= 500;
+					},
+				),
+				'page'        => array(
+					'default'           => 1,
+					'sanitize_callback' => 'absint',
+					'validate_callback' => function ( $value ) {
+						return $value >= 1;
+					},
+				),
 			),
 		)
 	);
@@ -128,7 +142,11 @@ function jr_content_core_register_rest_routes() {
 							return false;
 						}
 						foreach ( $value as $term_id ) {
-							if ( ! is_numeric( $term_id ) || absint( $term_id ) < 1 ) {
+							if ( is_int( $term_id ) ) {
+								if ( $term_id < 1 ) {
+									return false;
+								}
+							} elseif ( ! is_string( $term_id ) || ! ctype_digit( $term_id ) || (int) $term_id < 1 ) {
 								return false;
 							}
 						}
@@ -318,8 +336,8 @@ function jr_content_core_rest_playlists_without_thumbnails( WP_REST_Request $req
 }
 
 function jr_content_core_rest_playlists_games_terms( WP_REST_Request $request ) {
-	$per_page       = (int) $request->get_param( 'per_page' );
-	$page           = (int) $request->get_param( 'page' );
+	$per_page       = max( 1, (int) $request->get_param( 'per_page' ) );
+	$page           = max( 1, (int) $request->get_param( 'page' ) );
 	$modified_after = $request->get_param( 'modified_after' );
 
 	$post_statuses = array( 'publish', 'draft', 'pending', 'future' );
@@ -392,9 +410,19 @@ function jr_content_core_rest_playlists_games_terms( WP_REST_Request $request ) 
 
 function jr_content_core_rest_videos_by_playlist( WP_REST_Request $request ) {
 	$playlist_id = (int) $request->get_param( 'playlist_id' );
+	$per_page    = max( 1, (int) $request->get_param( 'per_page' ) );
+	$page        = max( 1, (int) $request->get_param( 'page' ) );
 
 	$post = get_post( $playlist_id );
-	if ( ! $post || ! current_user_can( 'edit_post', $playlist_id ) ) {
+	if ( ! $post || 'playlist' !== $post->post_type ) {
+		return new WP_Error(
+			'rest_not_found',
+			__( 'Playlist not found.', 'jr-content-core' ),
+			array( 'status' => 404 )
+		);
+	}
+
+	if ( ! current_user_can( 'edit_post', $playlist_id ) ) {
 		return new WP_Error(
 			'rest_forbidden',
 			__( 'You do not have permission to access this playlist.', 'jr-content-core' ),
@@ -410,8 +438,8 @@ function jr_content_core_rest_videos_by_playlist( WP_REST_Request $request ) {
 	$query_args = array(
 		'post_type'      => 'video',
 		'post_status'    => $post_statuses,
-		'posts_per_page' => -1,
-		'no_found_rows'  => true,
+		'posts_per_page' => $per_page,
+		'paged'          => $page,
 		'fields'         => 'ids',
 		'meta_query'     => array(
 			array(
@@ -427,8 +455,10 @@ function jr_content_core_rest_videos_by_playlist( WP_REST_Request $request ) {
 		$query_args['author'] = get_current_user_id();
 	}
 
-	$query     = new WP_Query( $query_args );
-	$video_ids = array();
+	$query       = new WP_Query( $query_args );
+	$total       = (int) $query->found_posts;
+	$total_pages = (int) ceil( $total / $per_page );
+	$video_ids   = array();
 	foreach ( $query->posts as $video_id ) {
 		if ( current_user_can( 'edit_post', $video_id ) ) {
 			$video_ids[] = (int) $video_id;
@@ -457,7 +487,11 @@ function jr_content_core_rest_videos_by_playlist( WP_REST_Request $request ) {
 		);
 	}
 
-	return rest_ensure_response( $items );
+	$response = rest_ensure_response( $items );
+	$response->header( 'X-WP-Total', $total );
+	$response->header( 'X-WP-TotalPages', $total_pages );
+
+	return $response;
 }
 
 function jr_content_core_rest_video_set_games_terms( WP_REST_Request $request ) {
