@@ -469,10 +469,6 @@ function jr_content_core_rest_videos_by_playlist( WP_REST_Request $request ) {
 		}
 	}
 
-	if ( ! empty( $video_ids ) ) {
-		update_meta_cache( 'post', $video_ids );
-	}
-
 	$terms_by_video = array();
 	if ( ! empty( $video_ids ) ) {
 		$all_terms = wp_get_object_terms( $video_ids, 'games', array( 'fields' => 'all_with_object_id' ) );
