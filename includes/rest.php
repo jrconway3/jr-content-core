@@ -107,7 +107,7 @@ function jr_content_core_register_rest_routes() {
 					'default'           => 100,
 					'sanitize_callback' => 'absint',
 					'validate_callback' => function ( $value ) {
-						return $value >= 1 && $value <= 500;
+						return $value >= 1 && $value <= 100;
 					},
 				),
 				'page'        => array(
@@ -137,6 +137,9 @@ function jr_content_core_register_rest_routes() {
 				),
 				'games_terms' => array(
 					'required'          => true,
+					'sanitize_callback' => function ( $value ) {
+						return array_map( 'absint', (array) $value );
+					},
 					'validate_callback' => function ( $value ) {
 						if ( ! is_array( $value ) ) {
 							return false;
